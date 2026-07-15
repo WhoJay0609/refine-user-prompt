@@ -1,0 +1,22 @@
+# OS and editor residue
+.DS_Store
+Thumbs.db
+*~
+*.swp
+
+# Python and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Runtime residue
+*.log
+tmp/
+.tmp/
