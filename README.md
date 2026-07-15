@@ -10,8 +10,19 @@ It follows the principles in OpenAI's [Prompting guidance for GPT-5.6](https://d
 - Removes repetition, irrelevant process narration, and contradictory scaffolding.
 - Keeps simple requests short and adds structure only when it changes behavior.
 - Asks only the smallest question needed to resolve a material ambiguity.
+- Recommends one explicit GPT-5.6 model variant and reasoning effort from task difficulty, risk, verification burden, latency, and cost priorities.
 - Recommends Codex Goal mode when durable state, dependent milestones, recovery, or repeated monitoring materially justify it.
 - Never creates a Goal or executes the refined task unless the user explicitly requests that separate action.
+
+## Model guidance
+
+The skill follows OpenAI's current [GPT-5.6 model guide](https://developers.openai.com/api/docs/guides/latest-model):
+
+- `gpt-5.6-luna` for efficient, routine, high-volume work;
+- `gpt-5.6-terra` as the balanced everyday default;
+- `gpt-5.6-sol` for flagship-quality complex or high-consequence work.
+
+It recommends `medium` as the balanced reasoning baseline, uses `low` for latency-sensitive work, reserves `high` or `xhigh` for tasks that benefit from deeper reasoning, and uses `max` only for the hardest quality-first workloads. Recommendations are advisory and never change the active model automatically.
 
 ## Repository layout
 

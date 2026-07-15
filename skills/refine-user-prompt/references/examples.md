@@ -16,6 +16,17 @@ Refined prompt:
 总结这篇文章。先给核心结论，再说明关键限制；保留理解结论所必需的证据，省略背景铺垫、重复解释和次要细节。
 ```
 
+```markdown
+### 模型配置建议
+
+- 任务难度：低
+- 模型：`gpt-5.6-luna`
+- 思考强度：`low`
+- 原因：任务目标明确、输出短且不需要复杂工具或多源判断。
+
+该配置仅为建议，不会自动切换模型或思考强度。
+```
+
 Why this shape works: the request is already clear, so a large template would add noise.
 
 ## Repository change
@@ -44,6 +55,18 @@ Refined prompt:
 
 输出：
 先给结果，再概述根因、修改文件、验证结果和剩余风险。
+```
+
+```markdown
+### 模型配置建议
+
+- 任务难度：中等
+- 模型：`gpt-5.6-terra`
+- 思考强度：`medium`
+- 原因：需要代码诊断、边界保持和测试验证，但当前范围仍然明确且有限。
+- 升级条件：如果根因涉及认证安全、跨服务状态或高影响回归，升级为 `gpt-5.6-sol` + `high`。
+
+该配置仅为建议，不会自动切换模型或思考强度。
 ```
 
 Why this shape works: it preserves the two explicit exclusions and turns generic process narration into completion criteria.
@@ -81,6 +104,18 @@ Refined prompt:
 主要类别和代表性一手来源均有支持后停止。只有缺少必需的比较字段或重要的新近方法类别时才继续检索。
 ```
 
+```markdown
+### 模型配置建议
+
+- 任务难度：高
+- 模型：`gpt-5.6-sol`
+- 思考强度：`high`
+- 原因：任务需要当前检索、多源证据核对、统一分类和对穷尽性边界的审慎判断。
+- 升级条件：只有在评测表明遗漏关键类别或证据冲突仍无法解决时，才比较 `xhigh`。
+
+该配置仅为建议，不会自动切换模型或思考强度。
+```
+
 Why this shape works: it converts an unsafe exhaustive claim into an explicit coverage contract without weakening the user's research goal.
 
 ## Editing with preservation
@@ -99,6 +134,17 @@ Refined prompt:
 优先保留原有实验数字、事实性陈述、结论强度、段落功能和引用关系。不要添加新证据、强化结论、使用宣传性措辞或增加新章节。
 
 只返回使用原文语言改写后的段落。
+```
+
+```markdown
+### 模型配置建议
+
+- 任务难度：低
+- 模型：`gpt-5.6-luna`
+- 思考强度：`low`
+- 原因：这是边界明确的文本改写，关键要求是保持事实和结论强度。
+
+该配置仅为建议，不会自动切换模型或思考强度。
 ```
 
 Why this shape works: preservation priorities matter more than a generic “professional” persona.
@@ -149,6 +195,18 @@ Refined prompt:
 论文初稿、实验依据和阶段验收记录均完成后停止；遇到会改变研究目标或验收标准的阻塞时请求确认。
 ```
 
+```markdown
+### 模型配置建议
+
+- 任务难度：高
+- 模型：`gpt-5.6-sol`
+- 思考强度：`high`
+- 原因：任务包含研究设计、实验判断、证据约束和论文结论一致性，错误会跨阶段传播。
+- 升级条件：只有最关键的实验解释或论文结论审查仍存在重大冲突时，才比较 `xhigh`。
+
+该配置仅为建议，不会自动切换模型或思考强度。
+```
+
 Execution-mode recommendation:
 
 ```markdown
@@ -180,6 +238,17 @@ Refined prompt:
 
 ```text
 诊断并修复该函数处理空列表时的错误。保留现有公开接口，实施范围内的最小修改，并运行对应单元测试；如果测试无法运行，说明原因和下一项最有效的验证。
+```
+
+```markdown
+### 模型配置建议
+
+- 任务难度：中等
+- 模型：`gpt-5.6-terra`
+- 思考强度：`medium`
+- 原因：需要理解代码、实施修复和验证，但范围小、停止条件明确且不需要持久状态。
+
+该配置仅为建议，不会自动切换模型或思考强度。
 ```
 
 Why this shape works: this is a bounded change with a clear validation path. Omit the execution-mode section because Goal mode would add overhead without durable orchestration value.

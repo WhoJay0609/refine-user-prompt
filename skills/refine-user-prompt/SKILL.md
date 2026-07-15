@@ -1,6 +1,6 @@
 ---
 name: refine-user-prompt
-description: Restructure a user's raw request into a lean, outcome-first prompt while preserving intent, facts, scope, language, authorization, evidence requirements, and output needs, and recommend Codex Goal mode when durable orchestration would materially help. Use when the user asks to 梳理、整理、优化、重写或改写提示词, convert an informal request into a GPT-5.6-ready prompt, remove repetition or contradictions from an instruction stack, clarify success criteria and stop rules, or assess whether the underlying task merits Goal mode without executing it or creating a Goal.
+description: Restructure a user's raw request into a lean, outcome-first prompt while preserving intent, facts, scope, language, authorization, evidence requirements, and output needs; recommend a GPT-5.6 model variant and reasoning effort from task difficulty; and recommend Codex Goal mode when durable orchestration would materially help. Use when the user asks to 梳理、整理、优化、重写或改写提示词, convert an informal request into a GPT-5.6-ready prompt, remove repetition or contradictions, clarify success and stop rules, or assess model, reasoning, or Goal-mode fit without executing the task, switching models, or creating a Goal.
 ---
 
 # Refine User Prompt
@@ -82,7 +82,32 @@ Stop rules: [when to answer, retry, ask, narrow, abstain, or stop]
 
 Omit empty or behavior-neutral sections. Describe the destination before the method and leave room for the model to choose an efficient path.
 
-### 5. Recommend Goal mode only when it materially helps
+### 5. Recommend a model and reasoning effort
+
+Assess the underlying task after refining its contract. Base difficulty on the combination of:
+
+- ambiguity and semantic judgment;
+- dependency depth and number of interacting constraints;
+- tool orchestration, retrieval, and verification burden;
+- context volume and cross-file or cross-source synthesis;
+- consequence of error, reversibility, and evidence requirements;
+- latency, throughput, and cost priorities stated by the user.
+
+Do not infer difficulty from prompt length, number of listed steps, or domain labels alone. Before increasing reasoning effort, check whether the refined prompt is missing a success criterion, dependency rule, tool route, or verification loop.
+
+Preserve an explicitly requested model or deployment constraint. Otherwise, when the current surface exposes the GPT-5.6 family, use this compact default rubric:
+
+- **`gpt-5.6-luna`:** choose for well-specified, routine, high-volume, or latency-sensitive transformations such as formatting, extraction, classification, short summaries, and small low-risk edits. Prefer the lowest available effort, normally `low`; use `none` only when the active API surface supports it and the task is deterministic.
+- **`gpt-5.6-terra`:** choose as the balanced default for everyday coding, analysis, research assistance, and moderate tool use with several constraints. Start at `medium`; use `low` when latency matters and quality remains sufficient.
+- **`gpt-5.6-sol`:** choose for flagship-quality work involving deep ambiguity, difficult debugging, architecture, complex optimization, high-value review, deep research, or high consequences of error. Start at `medium` or `high`; use `xhigh` only when the extra reasoning has a clear expected benefit.
+
+Reserve `max` for the hardest quality-first workloads that need extensive exploration and verification; never recommend it globally. The `gpt-5.6` alias routes to `gpt-5.6-sol`, but prefer an explicit variant in recommendations. Recommend only models and effort levels available on the active surface. If availability is unknown, state the assumption instead of inventing support, pricing, or latency.
+
+For a mixed workflow, recommend one default configuration and at most one escalation condition. Keep model choice, reasoning effort, and Goal-mode suitability separate: durability does not imply cognitive difficulty, and difficulty does not imply a need for durable state.
+
+Treat the configuration as advisory. Never claim to switch the active model or reasoning effort from this recommendation.
+
+### 6. Recommend Goal mode only when it materially helps
 
 Evaluate the underlying task after refining its contract. Recommend Codex Goal mode when durable orchestration is materially useful, especially when the task has one or more of these properties:
 
@@ -98,7 +123,7 @@ Use judgment from the task shape rather than keyword matching. If a missing fact
 
 Keep recommendation separate from authorization. Never create a Goal, invoke `goal-entry`, update Goal state, or begin executing the refined task unless the user explicitly requests that separate action.
 
-### 6. Preserve domain-specific boundaries
+### 7. Preserve domain-specific boundaries
 
 Apply these rules only when relevant:
 
@@ -126,6 +151,22 @@ Preserve the source request's language, including headings, unless the user requ
 
 - [the smallest question or unresolved conflict]
 ```
+
+For every sufficiently specified task, add a localized model recommendation after the refined prompt. For a Chinese request, use:
+
+```markdown
+### 模型配置建议
+
+- 任务难度：[低 / 中等 / 高 / 极高]
+- 模型：`[one explicit available model]`
+- 思考强度：`[one available reasoning effort]`
+- 原因：[one concise task-specific reason]
+- 升级条件：[include only when one concrete condition would justify a stronger configuration]
+
+该配置仅为建议，不会自动切换模型或思考强度。
+```
+
+Choose one default, not a menu. Omit `升级条件` when it adds no decision value. If a material ambiguity prevents a responsible difficulty assessment, ask the smallest question first and defer the recommendation.
 
 When Goal mode is recommended, add a localized execution-mode section after the refined prompt. For a Chinese request, use:
 
@@ -156,8 +197,11 @@ Before responding, verify:
 - duplicate or contradictory instructions were removed or surfaced;
 - success and stopping conditions are sufficient for the task;
 - the structure is no more elaborate than the task requires;
+- the model and effort recommendation matches task difficulty, risk, latency, cost, and current availability;
+- `max` is reserved for a concrete hardest-quality-first reason rather than used as a default;
+- no model or reasoning setting was claimed to be changed automatically;
 - any Goal-mode recommendation is justified by durable orchestration needs rather than complexity alone;
 - no Goal was created, invoked, or executed from the recommendation;
 - the output can be copied and used directly.
 
-For representative coding, research, rewriting, Goal-mode, and short-input transformations, read [references/examples.md](references/examples.md) only when an example is needed.
+For representative coding, research, rewriting, model-selection, Goal-mode, and short-input transformations, read [references/examples.md](references/examples.md) only when an example is needed.
