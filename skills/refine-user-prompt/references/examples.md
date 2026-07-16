@@ -102,7 +102,7 @@ Response shape:
 停止规则：
 论文初稿、实验依据和阶段验收记录均完成后停止；遇到会改变研究目标、验收标准、授权范围或资源成本的阻塞时请求确认。
 
-[then call create_goal with a compact objective derived from the refined prompt]
+[then call create_goal with the displayed refined prompt body as the objective]
 ```
 
 Why this shape works: Goal creation is allowed because durable state is useful and the user explicitly authorized it.
@@ -149,7 +149,7 @@ Response shape:
 停止规则：
 审稿意见处理、论文修订、验证和结果汇总完成后停止；缺少审稿意见、主文件、实验依据或授权边界时先询问。
 
-[then call create_goal with a compact objective derived from the refined prompt]
+[then call create_goal with the displayed refined prompt body as the objective]
 ```
 
 Why this shape works: even without the word `Goal`, the user authorized execution and the paper task has durable multi-stage revision, evidence, and build gates.

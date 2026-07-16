@@ -183,7 +183,17 @@ Use judgment from the task shape rather than keyword matching. If a missing fact
 
 Keep recommendation separate from authorization. If Goal mode is useful but neither explicit Goal authorization nor authorized durable execution is present, show the refined prompt, state that Goal creation needs confirmation, and stop before calling `create_goal`.
 
-When `refine_then_create_goal` is selected, create the Goal with a compact objective derived from the refined prompt. Keep the objective under 4,000 characters, preserve the user's success criteria and authorization boundaries, and do not start external, destructive, costly, or scope-expanding work unless separately authorized.
+When `refine_then_create_goal` is selected, create the Goal with the displayed refined prompt body as the `objective` by default. Do not re-summarize it into a numbered task list merely for neatness. The Goal objective is the durable execution contract, so preserve the refined prompt's headings, success criteria, authorization boundaries, validation requirements, output contract, and stop rules.
+
+If the displayed refined prompt body would exceed the Goal objective length limit, compress it only enough to fit. Compression must preserve, in order:
+
+1. Explicit prohibitions, approval gates, and authorization boundaries.
+2. Stop rules, terminal states, and decision criteria.
+3. Success criteria and required validation/evidence.
+4. Required outputs and reporting language/format.
+5. Essential background, inputs, paths, names, dates, and frozen facts.
+
+Do not compress away conditions such as `only proceed if`, `must confirm before`, `do not modify`, `STOP`, `GO`, `NARROW`, `PIVOT_REQUIRED`, evidence hashes, compile/test gates, or external-service restrictions. After Goal creation, do not start external, destructive, costly, or scope-expanding work unless separately authorized.
 
 ### 7. Preserve domain-specific boundaries
 
@@ -219,7 +229,7 @@ After showing the refined prompt:
 - For `refine_only`, stop after any required `待确认项`.
 - For `refine_then_answer`, answer from the refined prompt in the same response.
 - For `refine_then_execute`, proceed with the ordinary task after the prompt, respecting confirmation gates.
-- For `refine_then_create_goal`, call `create_goal` only after displaying the refined prompt and only when explicit Goal authorization is present or the user has authorized execution of a clearly durable-goal-shaped task. Then continue according to the created Goal's lifecycle and the user's authorization boundaries.
+- For `refine_then_create_goal`, call `create_goal` only after displaying the refined prompt and only when explicit Goal authorization is present or the user has authorized execution of a clearly durable-goal-shaped task. Use the displayed refined prompt body itself as the Goal `objective` unless length forces boundary-preserving compression. Then continue according to the created Goal's lifecycle and the user's authorization boundaries.
 
 Preserve the source request's language, including headings, unless the user requests another language. Add a localized `待确认项` / `Open questions` section only when material information remains unresolved. For a Chinese request, use:
 
@@ -249,6 +259,7 @@ Before responding, verify:
 - no model or reasoning setting was claimed to be changed automatically;
 - any Goal creation is justified by durable orchestration needs and explicit authorization rather than complexity alone;
 - any Goal creation prompt uses the fixed template and remains directly usable;
+- the Goal objective is the displayed refined prompt body by default, not a lossy summary;
 - no Goal was created from recommendation alone;
 - the output can be copied and used directly.
 
