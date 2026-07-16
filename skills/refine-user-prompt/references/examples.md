@@ -1,6 +1,6 @@
 # Refactoring Examples
 
-Use these examples to calibrate semantic preservation and proportional structure. Do not copy their domain details into unrelated requests.
+Use these examples to calibrate semantic preservation, proportional structure, and the front-loaded advisory line. Do not copy their domain details into unrelated requests.
 
 ## Short request
 
@@ -12,19 +12,12 @@ Raw input:
 
 Refined prompt:
 
-```text
-总结这篇文章。先给核心结论，再说明关键限制；保留理解结论所必需的证据，省略背景铺垫、重复解释和次要细节。
-```
-
 ```markdown
-### 模型配置建议
+### 重构后的提示词
 
-- 任务难度：低
-- 模型：`gpt-5.6-luna`
-- 思考强度：`low`
-- 原因：任务目标明确、输出短且不需要复杂工具或多源判断。
+建议：目标模式：普通对话即可；模型：`gpt-5.6-luna`；思考强度：`low`；理由：任务目标明确、输出短且不需要复杂工具或多源判断。
 
-该配置仅为建议，不会自动切换模型或思考强度。
+总结这篇文章。先给核心结论，再说明关键限制；保留理解结论所必需的证据，省略背景铺垫、重复解释和次要细节。
 ```
 
 Why this shape works: the request is already clear, so a large template would add noise.
@@ -39,7 +32,11 @@ Raw input:
 
 Refined prompt:
 
-```text
+```markdown
+### 重构后的提示词
+
+建议：目标模式：普通对话即可；模型：`gpt-5.6-terra`；思考强度：`medium`；理由：需要代码诊断、范围控制和测试验证，但停止条件明确且不需要持久状态。
+
 目标：端到端诊断并修复登录故障。
 
 成功标准：
@@ -57,19 +54,7 @@ Refined prompt:
 先给结果，再概述根因、修改文件、验证结果和剩余风险。
 ```
 
-```markdown
-### 模型配置建议
-
-- 任务难度：中等
-- 模型：`gpt-5.6-terra`
-- 思考强度：`medium`
-- 原因：需要代码诊断、边界保持和测试验证，但当前范围仍然明确且有限。
-- 升级条件：如果根因涉及认证安全、跨服务状态或高影响回归，升级为 `gpt-5.6-sol` + `high`。
-
-该配置仅为建议，不会自动切换模型或思考强度。
-```
-
-Why this shape works: it preserves the two explicit exclusions and turns generic process narration into completion criteria.
+Why this shape works: it preserves the explicit exclusions and turns process narration into completion criteria.
 
 ## Grounded research
 
@@ -81,7 +66,11 @@ Raw input:
 
 Refined prompt:
 
-```text
+```markdown
+### 重构后的提示词
+
+建议：目标模式：普通对话即可；模型：`gpt-5.6-sol`；思考强度：`high`；理由：任务需要当前检索、多源证据核对、统一分类和对穷尽性边界的审慎判断。
+
 目标：形成一份当前且有证据支持的多模态模型剪枝方法综述。
 
 成功标准：
@@ -104,18 +93,6 @@ Refined prompt:
 主要类别和代表性一手来源均有支持后停止。只有缺少必需的比较字段或重要的新近方法类别时才继续检索。
 ```
 
-```markdown
-### 模型配置建议
-
-- 任务难度：高
-- 模型：`gpt-5.6-sol`
-- 思考强度：`high`
-- 原因：任务需要当前检索、多源证据核对、统一分类和对穷尽性边界的审慎判断。
-- 升级条件：只有在评测表明遗漏关键类别或证据冲突仍无法解决时，才比较 `xhigh`。
-
-该配置仅为建议，不会自动切换模型或思考强度。
-```
-
 Why this shape works: it converts an unsafe exhaustive claim into an explicit coverage contract without weakening the user's research goal.
 
 ## Editing with preservation
@@ -128,23 +105,16 @@ Raw input:
 
 Refined prompt:
 
-```text
+```markdown
+### 重构后的提示词
+
+建议：目标模式：普通对话即可；模型：`gpt-5.6-luna`；思考强度：`low`；理由：这是边界明确的文本改写，关键要求是保持事实和结论强度。
+
 润色给定论文段落，提高表达清晰度、连贯性、准确性和专业性。
 
 优先保留原有实验数字、事实性陈述、结论强度、段落功能和引用关系。不要添加新证据、强化结论、使用宣传性措辞或增加新章节。
 
 只返回使用原文语言改写后的段落。
-```
-
-```markdown
-### 模型配置建议
-
-- 任务难度：低
-- 模型：`gpt-5.6-luna`
-- 思考强度：`low`
-- 原因：这是边界明确的文本改写，关键要求是保持事实和结论强度。
-
-该配置仅为建议，不会自动切换模型或思考强度。
 ```
 
 Why this shape works: preservation priorities matter more than a generic “professional” persona.
@@ -177,11 +147,19 @@ Raw input:
 
 Refined prompt:
 
-```text
-目标：完成研究方案设计、数据准备、实验执行、结果分析和论文初稿，并保持阶段之间的证据与决策连续性。
+```markdown
+### 重构后的提示词
+
+建议：目标模式：建议使用；模型：`gpt-5.6-sol`；思考强度：`high`；理由：任务包含多阶段验收、长时间实验、中断恢复和失败重试，持久状态会直接影响完成质量。
+
+目标：
+完成研究方案设计、数据准备、实验执行、结果分析和论文初稿，并保持阶段之间的证据与决策连续性。
+
+背景与输入：
+使用当前项目资料、数据、实验配置、运行日志和已有研究上下文；开始前先确认缺失的关键项目路径、数据入口或实验约束。
 
 成功标准：
-- 每个阶段有明确交付物和验收条件；
+- 每个阶段都有明确交付物和验收条件；
 - 只有当前阶段通过验收后才进入下一阶段；
 - 实验运行状态、失败原因、重试记录和有效结果可恢复；
 - 论文初稿中的结论与已验收实验结果一致。
@@ -189,42 +167,20 @@ Refined prompt:
 约束与授权：
 - 不要跳过数据和实验完整性检查；
 - 不要把失败或未验证结果写成论文结论；
+- 可直接执行项目范围内的读取、分析、实验准备、实验运行和本地验证；
 - 外部发布、付费资源或实质性改变研究目标前必须确认。
 
+工具与验证：
+查阅项目文件、实验配置、数据说明和运行日志；按阶段运行必要检查或实验；记录失败、重试、有效结果和不能运行的验证原因。
+
+输出：
+使用中文。按阶段给出交付物、关键决策、验证结果、剩余风险和论文初稿。
+
 停止规则：
-论文初稿、实验依据和阶段验收记录均完成后停止；遇到会改变研究目标或验收标准的阻塞时请求确认。
+论文初稿、实验依据和阶段验收记录均完成后停止；遇到会改变研究目标、验收标准、授权范围或资源成本的阻塞时请求确认。
 ```
 
-```markdown
-### 模型配置建议
-
-- 任务难度：高
-- 模型：`gpt-5.6-sol`
-- 思考强度：`high`
-- 原因：任务包含研究设计、实验判断、证据约束和论文结论一致性，错误会跨阶段传播。
-- 升级条件：只有最关键的实验解释或论文结论审查仍存在重大冲突时，才比较 `xhigh`。
-
-该配置仅为建议，不会自动切换模型或思考强度。
-```
-
-Execution-mode recommendation:
-
-```markdown
-### 执行模式建议
-
-建议使用目标模式。
-
-原因：
-- 任务包含多个相互依赖且需要逐阶段验收的阶段；
-- 实验可能长时间运行，并要求中断恢复、失败记录和重试；
-- 最终论文结论依赖持久保存的实验状态与证据。
-
-建议目标：端到端完成该研究项目的方案、数据、实验、分析和论文初稿，并以阶段验收和可恢复实验状态保证证据连续性。
-
-该提示仅为建议，不会自动创建或执行目标。如需启用，请明确要求创建目标。
-```
-
-Why this shape works: Goal mode provides material value through durable state, dependent milestones, recovery, and acceptance gates.
+Why this shape works: Goal mode provides material value through durable state, dependent milestones, recovery, and acceptance gates, so the refined prompt uses the fixed Goal-mode template directly.
 
 ## Goal mode omitted
 
@@ -236,19 +192,12 @@ Raw input:
 
 Refined prompt:
 
-```text
+```markdown
+### 重构后的提示词
+
+建议：目标模式：普通对话即可；模型：`gpt-5.6-terra`；思考强度：`medium`；理由：需要理解代码、实施修复和验证，但范围小、停止条件明确且不需要持久状态。
+
 诊断并修复该函数处理空列表时的错误。保留现有公开接口，实施范围内的最小修改，并运行对应单元测试；如果测试无法运行，说明原因和下一项最有效的验证。
 ```
 
-```markdown
-### 模型配置建议
-
-- 任务难度：中等
-- 模型：`gpt-5.6-terra`
-- 思考强度：`medium`
-- 原因：需要理解代码、实施修复和验证，但范围小、停止条件明确且不需要持久状态。
-
-该配置仅为建议，不会自动切换模型或思考强度。
-```
-
-Why this shape works: this is a bounded change with a clear validation path. Omit the execution-mode section because Goal mode would add overhead without durable orchestration value.
+Why this shape works: this is a bounded change with a clear validation path, so Goal mode would add overhead without durable orchestration value.

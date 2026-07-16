@@ -58,7 +58,9 @@ Keep true invariants. Use absolute words such as `must`, `never`, `only`, `必�
 
 ### 4. Structure to the task's complexity
 
-Keep a simple request to one sentence or a short list. For a complex request, select only the useful sections from this order:
+Keep a simple request to one sentence or a short list. The refined prompt must be directly usable whether or not Goal mode is recommended.
+
+For complex non-Goal requests, select only the useful sections from this order:
 
 ```text
 Role: [include only when role or domain context changes behavior]
@@ -78,6 +80,35 @@ Tools and validation: [routing, prerequisites, checks, fallbacks]
 Output: [format, language, structure, length, tone]
 
 Stop rules: [when to answer, retry, ask, narrow, abstain, or stop]
+```
+
+When Goal mode is recommended, use this fixed template for the refined prompt. Keep the Chinese headings exactly for Chinese requests; translate them only when the source request is not Chinese.
+
+```text
+目标：
+[最终希望获得什么结果]
+
+背景与输入：
+[必要的项目、数据、文件和上下文]
+
+成功标准：
+- [完成后必须成立的条件]
+- [必须覆盖的内容]
+- [必须通过的验证]
+
+约束与授权：
+- [不能改变什么]
+- [哪些操作可以直接执行]
+- [哪些操作必须先征得我同意]
+
+工具与验证：
+[需要查阅什么、运行什么测试、如何检查结果]
+
+输出：
+[语言、结构、长度和格式]
+
+停止规则：
+[什么时候可以结束；缺什么信息时再问我]
 ```
 
 Omit empty or behavior-neutral sections. Describe the destination before the method and leave room for the model to choose an efficient path.
@@ -141,8 +172,16 @@ By default, return only the ready-to-use prompt under a short heading in the sou
 ```markdown
 ### 重构后的提示词
 
+建议：目标模式：[建议使用 / 普通对话即可]；模型：`[one explicit available model]`；思考强度：`[one available reasoning effort]`；理由：[one concise task-specific reason]
+
 [ready-to-use prompt]
 ```
+
+Put the recommendation first and keep it to one line. Always recommend one default model configuration for sufficiently specified tasks. Include Goal-mode suitability in that same line; do not add a separate model or execution-mode section.
+
+Use `普通对话即可` when Goal mode would add no material value. Use `建议使用` only when durable orchestration materially helps. The recommendation is advisory: it does not create a Goal, switch models, or change reasoning effort.
+
+When Goal mode is recommended, the prompt after the first line must use the fixed Goal-mode template from the workflow and must remain directly usable by the user. When Goal mode is not recommended, the prompt after the first line can remain a compact sentence or proportional sectioned prompt.
 
 Preserve the source request's language, including headings, unless the user requests another language. Add a localized `待确认项` / `Open questions` section only when material information remains unresolved. For a Chinese request, use:
 
@@ -152,38 +191,7 @@ Preserve the source request's language, including headings, unless the user requ
 - [the smallest question or unresolved conflict]
 ```
 
-For every sufficiently specified task, add a localized model recommendation after the refined prompt. For a Chinese request, use:
-
-```markdown
-### 模型配置建议
-
-- 任务难度：[低 / 中等 / 高 / 极高]
-- 模型：`[one explicit available model]`
-- 思考强度：`[one available reasoning effort]`
-- 原因：[one concise task-specific reason]
-- 升级条件：[include only when one concrete condition would justify a stronger configuration]
-
-该配置仅为建议，不会自动切换模型或思考强度。
-```
-
-Choose one default, not a menu. Omit `升级条件` when it adds no decision value. If a material ambiguity prevents a responsible difficulty assessment, ask the smallest question first and defer the recommendation.
-
-When Goal mode is recommended, add a localized execution-mode section after the refined prompt. For a Chinese request, use:
-
-```markdown
-### 执行模式建议
-
-建议使用目标模式。
-
-原因：
-- [one to three concrete reasons from the task shape]
-
-建议目标：[one-sentence objective derived from the refined prompt]
-
-该提示仅为建议，不会自动创建或执行目标。如需启用，请明确要求创建目标。
-```
-
-Omit this section when Goal mode would add no material value. Do not add a negative “不需要目标模式” notice unless the user explicitly asks for a mode assessment.
+Choose one default, not a menu. If one concrete escalation condition would materially help, incorporate it briefly in the ready-to-use prompt's `工具与验证` or `停止规则` section instead of adding a separate recommendation block. If a material ambiguity prevents a responsible difficulty or Goal-mode assessment, ask the smallest question first and defer the recommendation.
 
 Do not add a change log, rationale, score, or prompt-engineering lecture unless requested. If the user asks for both a refined prompt and an explanation, place the ready-to-use prompt first.
 
@@ -197,10 +205,12 @@ Before responding, verify:
 - duplicate or contradictory instructions were removed or surfaced;
 - success and stopping conditions are sufficient for the task;
 - the structure is no more elaborate than the task requires;
+- the first line states Goal-mode suitability, model, reasoning effort, and one concise reason;
 - the model and effort recommendation matches task difficulty, risk, latency, cost, and current availability;
 - `max` is reserved for a concrete hardest-quality-first reason rather than used as a default;
 - no model or reasoning setting was claimed to be changed automatically;
 - any Goal-mode recommendation is justified by durable orchestration needs rather than complexity alone;
+- any Goal-mode prompt uses the fixed template and remains directly usable;
 - no Goal was created, invoked, or executed from the recommendation;
 - the output can be copied and used directly.
 

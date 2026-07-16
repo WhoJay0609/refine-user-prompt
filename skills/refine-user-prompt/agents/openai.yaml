@@ -1,4 +1,4 @@
 interface:
   display_name: "Refine User Prompt"
-  short_description: "Refine prompts and recommend model, effort, and mode"
-  default_prompt: "Use $refine-user-prompt to restructure my request and recommend the model, reasoning effort, and execution mode."
+  short_description: "Refine prompts with front-loaded mode and model advice"
+  default_prompt: "Use $refine-user-prompt to restructure my request, put Goal-mode and model advice first in one line, and return a directly usable prompt."
