@@ -1,6 +1,6 @@
 ---
 name: refine-user-prompt
-description: Refine a user's raw request into a lean, outcome-first execution prompt, show the refined prompt before acting, then either answer/execute from that prompt or create a Codex Goal when explicitly authorized. Preserve intent, facts, scope, language, authorization, evidence requirements, and output needs; recommend a GPT-5.6 model variant and reasoning effort from task difficulty. Use when the user asks to 梳理、整理、优化、重写或改写提示词, convert an informal request into a GPT-5.6-ready prompt, refine then execute, decide whether to use or create a Goal, or clarify success criteria and stop rules.
+description: Refine a user's raw request into a lean, outcome-first execution prompt, show the refined prompt before acting, then either answer/execute from that prompt or create a Codex Goal when authorized or strongly warranted by an authorized long-horizon task. Preserve intent, facts, scope, language, authorization, evidence requirements, and output needs; recommend a GPT-5.6 model variant and reasoning effort. Use when the user asks to 梳理、整理、优化、重写或改写提示词, convert an informal request into a GPT-5.6-ready prompt, refine then execute, proactively decide whether to create a Goal, or clarify success criteria and stop rules.
 ---
 
 # Refine User Prompt
@@ -14,9 +14,9 @@ Use one of four modes:
 - `refine_only`: show the refined prompt and stop when the user asks only for rewriting, planning, or no execution.
 - `refine_then_answer`: show the refined prompt, then answer directly for bounded non-mutating work.
 - `refine_then_execute`: show the refined prompt, then execute ordinary authorized work while preserving all confirmation gates.
-- `refine_then_create_goal`: show the refined prompt, then create a Codex Goal only when the user explicitly authorizes Goal creation for the refined objective.
+- `refine_then_create_goal`: show the refined prompt, then create a Codex Goal when Goal creation is explicitly authorized or when the user has authorized execution and the task is clearly durable-goal-shaped.
 
-Never hide the refined prompt. Never treat a Goal recommendation as permission to create a Goal. Never create a Goal, mutate files, call external services, push, delete, install, spend money, or run high-cost jobs unless the original user request or a later confirmation authorizes that action.
+Never hide the refined prompt. Never treat vague complexity as permission to create a Goal. Never create a Goal, mutate files, call external services, push, delete, install, spend money, or run high-cost jobs unless the original user request or a later confirmation authorizes that class of action.
 
 Preserve, in this priority order:
 
@@ -149,10 +149,10 @@ Treat the configuration as advisory. Never claim to switch the active model or r
 
 ### 6. Decide execution mode and Goal creation
 
-Evaluate the underlying task after refining its contract. Use `refine_then_create_goal` only when both conditions hold:
+Evaluate the underlying task after refining its contract. Use `refine_then_create_goal` when either path applies:
 
-1. Goal mode is materially useful because durable orchestration is needed.
-2. The user explicitly authorizes creating a Goal, such as `润色后如果需要就创建 Goal`, `自动创建目标`, `创建 Goal 后执行`, or equivalent wording.
+1. **Explicit Goal path:** Goal mode is materially useful and the user explicitly authorizes creating a Goal, such as `润色后如果需要就创建 Goal`, `自动创建目标`, `创建 Goal 后执行`, or equivalent wording.
+2. **Proactive Goal path:** the user authorizes execution or says to directly use the refined prompt, and the task is clearly durable-goal-shaped. In this path, Goal creation does not need the word `Goal`, but it still must preserve all operation-level confirmation gates.
 
 Goal mode is materially useful especially when the task has one or more of these properties:
 
@@ -161,6 +161,15 @@ Goal mode is materially useful especially when the task has one or more of these
 - repeated monitoring, experiments, evaluations, retries, or recovery that must preserve state;
 - multiple dependent deliverables with explicit acceptance and closeout gates;
 - an explicit terminal condition that requires durable progress tracking rather than a single bounded response.
+
+Treat paper, thesis, manuscript, rebuttal, grant, patent, or long-form technical-document revision as durable-goal-shaped when the request asks to actually revise or finish the artifact and includes any of these signals:
+
+- cross-section or cross-file consistency, references, figures, tables, experiments, claims, rebuttal points, supplement, or compilation must stay synchronized;
+- multiple passes are expected, such as review, rewrite, verify, compile, polish, and closeout;
+- quality gates matter, such as submission readiness, reviewer response, evidence/claim boundaries, citation checks, LaTeX/PDF/DOCX build, or final artifact delivery;
+- the work is likely to span many edits or multiple turns and needs resumable state.
+
+For these paper-like tasks, prefer `refine_then_create_goal` over `refine_then_execute` when execution is authorized, even if the user phrased it as “改论文”, “润色全文”, “把论文改好”, “按意见修改”, or “推进到可投稿”. Keep simple paragraph editing, short abstract rewriting, grammar polishing, or a single bounded section edit as `refine_then_answer` or `refine_then_execute`.
 
 Use `refine_then_execute` for ordinary authorized implementation, debugging, review fixes, document generation, or local validation that can proceed in the current task without durable Goal state.
 
@@ -172,9 +181,9 @@ Do not recommend or create Goal mode merely because the task is long, technicall
 
 Use judgment from the task shape rather than keyword matching. If a missing fact materially determines suitability, ask the smallest question instead of making a speculative recommendation.
 
-Keep recommendation separate from authorization. If Goal mode is useful but not explicitly authorized, show the refined prompt, state that Goal creation needs confirmation, and stop before calling `create_goal`.
+Keep recommendation separate from authorization. If Goal mode is useful but neither explicit Goal authorization nor authorized durable execution is present, show the refined prompt, state that Goal creation needs confirmation, and stop before calling `create_goal`.
 
-When `refine_then_create_goal` is authorized, create the Goal with a compact objective derived from the refined prompt. Keep the objective under 4,000 characters, preserve the user's success criteria and authorization boundaries, and do not start external, destructive, costly, or scope-expanding work unless separately authorized.
+When `refine_then_create_goal` is selected, create the Goal with a compact objective derived from the refined prompt. Keep the objective under 4,000 characters, preserve the user's success criteria and authorization boundaries, and do not start external, destructive, costly, or scope-expanding work unless separately authorized.
 
 ### 7. Preserve domain-specific boundaries
 
@@ -201,7 +210,7 @@ By default, first return the refined prompt under a short heading in the source 
 
 Put the recommendation first and keep it to one line. Always recommend one default model configuration for sufficiently specified tasks. Include the execution mode in that same line; do not add a separate model or execution-mode section.
 
-Use `refine_then_create_goal` only when the user explicitly authorized Goal creation. Use `refine_then_execute` for ordinary authorized work, `refine_then_answer` for bounded non-mutating work, and `refine_only` when execution is not authorized. The model and effort recommendation is advisory: it does not switch models or reasoning effort.
+Use `refine_then_create_goal` when Goal creation is explicitly authorized or when authorized execution is clearly durable-goal-shaped. Use `refine_then_execute` for ordinary authorized work, `refine_then_answer` for bounded non-mutating work, and `refine_only` when execution is not authorized. The model and effort recommendation is advisory: it does not switch models or reasoning effort.
 
 When `refine_then_create_goal` is selected, the prompt after the first line must use the fixed Goal-mode template from the workflow and must remain directly usable by the user. When Goal creation is not selected, the prompt after the first line can remain a compact sentence or proportional sectioned prompt.
 
@@ -210,7 +219,7 @@ After showing the refined prompt:
 - For `refine_only`, stop after any required `待确认项`.
 - For `refine_then_answer`, answer from the refined prompt in the same response.
 - For `refine_then_execute`, proceed with the ordinary task after the prompt, respecting confirmation gates.
-- For `refine_then_create_goal`, call `create_goal` only after displaying the refined prompt and only when explicit authorization is already present. Then continue according to the created Goal's lifecycle and the user's authorization boundaries.
+- For `refine_then_create_goal`, call `create_goal` only after displaying the refined prompt and only when explicit Goal authorization is present or the user has authorized execution of a clearly durable-goal-shaped task. Then continue according to the created Goal's lifecycle and the user's authorization boundaries.
 
 Preserve the source request's language, including headings, unless the user requests another language. Add a localized `待确认项` / `Open questions` section only when material information remains unresolved. For a Chinese request, use:
 

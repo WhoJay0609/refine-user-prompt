@@ -1,4 +1,4 @@
 interface:
   display_name: "Refine User Prompt"
-  short_description: "Show a refined prompt, then answer, execute, or create a Goal"
-  default_prompt: "Use $refine-user-prompt to refine my request, show the refined prompt first, then answer, execute, or create a Goal if I explicitly authorize it."
+  short_description: "Refine first, then answer, execute, or proactively create a Goal"
+  default_prompt: "Use $refine-user-prompt to refine my request, show the refined prompt first, then answer, execute, or create a Goal when the authorized task warrants durable state."

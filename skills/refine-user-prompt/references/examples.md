@@ -107,6 +107,79 @@ Response shape:
 
 Why this shape works: Goal creation is allowed because durable state is useful and the user explicitly authorized it.
 
+## Paper revision proactively creates Goal
+
+Raw input:
+
+```text
+帮我把这篇论文按审稿意见改好，检查实验结论和引用，最后编译 PDF，改完直接给我结果。
+```
+
+Response shape:
+
+```markdown
+### 重构后的提示词
+
+建议：执行模式：`refine_then_create_goal`；模型：`gpt-5.6-sol`；思考强度：`high`；理由：用户已授权实际修改论文，任务涉及审稿意见、全文一致性、实验结论、引用和 PDF 编译，适合用 Goal 保留阶段状态与验收记录。
+
+目标：
+按审稿意见完成论文修订，确保实验结论、引用、正文、图表和最终 PDF 一致，并交付可检查的修改结果。
+
+背景与输入：
+使用当前论文源文件、审稿意见、实验结果、引用库、图表和构建配置；开始前确认论文主文件、审稿意见位置和编译命令。
+
+成功标准：
+- 审稿意见中的实质问题均有对应修改或解释；
+- 实验结论、数值、引用、图表和正文表述一致；
+- 论文能够完成指定编译或明确说明无法编译的原因；
+- 输出修改摘要、验证结果和剩余风险。
+
+约束与授权：
+- 不要夸大实验结论或添加无依据声明；
+- 不要改动无关项目文件；
+- 可直接修改论文相关本地文件并运行本地验证；
+- 外部提交、远程推送、付费资源或大规模实验前必须确认。
+
+工具与验证：
+查阅论文源文件、审稿意见、引用库、图表和实验结果；运行相关文本/引用/编译检查；记录无法运行的检查及替代验证。
+
+输出：
+使用中文。先给完成结果，再列修改摘要、关键证据、编译/验证结果和待用户确认的剩余事项。
+
+停止规则：
+审稿意见处理、论文修订、验证和结果汇总完成后停止；缺少审稿意见、主文件、实验依据或授权边界时先询问。
+
+[then call create_goal with a compact objective derived from the refined prompt]
+```
+
+Why this shape works: even without the word `Goal`, the user authorized execution and the paper task has durable multi-stage revision, evidence, and build gates.
+
+## Bounded paragraph edit stays ordinary
+
+Raw input:
+
+```text
+帮我润色这段论文，写得更专业一点，但不要改实验数字，也别把结论吹大。
+```
+
+Response shape:
+
+```markdown
+### 重构后的提示词
+
+建议：执行模式：`refine_then_answer`；模型：`gpt-5.6-luna`；思考强度：`low`；理由：这是边界明确的短文本改写，不需要持久状态或 Goal。
+
+润色给定论文段落，提高表达清晰度、连贯性、准确性和专业性。
+
+优先保留原有实验数字、事实性陈述、结论强度、段落功能和引用关系。不要添加新证据、强化结论、使用宣传性措辞或增加新章节。
+
+只返回使用原文语言改写后的段落。
+
+[then provide the revised paragraph]
+```
+
+Why this shape works: paper domain alone is not enough; the work is a bounded paragraph edit.
+
 ## Goal useful but not authorized
 
 Raw input:
