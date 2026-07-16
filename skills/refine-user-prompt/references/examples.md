@@ -1,8 +1,8 @@
 # Refactoring Examples
 
-Use these examples to calibrate semantic preservation, proportional structure, and the front-loaded advisory line. Do not copy their domain details into unrelated requests.
+Use these examples to calibrate semantic preservation, proportional structure, and the mandatory "show the refined prompt before acting" rule. Do not copy their domain details into unrelated requests.
 
-## Short request
+## Short answer after refinement
 
 Raw input:
 
@@ -10,19 +10,21 @@ Raw input:
 帮我把这篇文章总结一下，要短一点，重点说结论和限制。
 ```
 
-Refined prompt:
+Response shape:
 
 ```markdown
 ### 重构后的提示词
 
-建议：目标模式：普通对话即可；模型：`gpt-5.6-luna`；思考强度：`low`；理由：任务目标明确、输出短且不需要复杂工具或多源判断。
+建议：执行模式：`refine_then_answer`；模型：`gpt-5.6-luna`；思考强度：`low`；理由：任务目标明确、输出短且不需要复杂工具或副作用。
 
 总结这篇文章。先给核心结论，再说明关键限制；保留理解结论所必需的证据，省略背景铺垫、重复解释和次要细节。
+
+[then provide the summary]
 ```
 
-Why this shape works: the request is already clear, so a large template would add noise.
+Why this shape works: the refined prompt is visible, then the agent answers directly because no side effect is needed.
 
-## Repository change
+## Ordinary execution after refinement
 
 Raw input:
 
@@ -30,12 +32,12 @@ Raw input:
 看看这个登录 bug，先看看代码，找原因，然后修一下。别改接口，也别碰支付。
 ```
 
-Refined prompt:
+Response shape:
 
 ```markdown
 ### 重构后的提示词
 
-建议：目标模式：普通对话即可；模型：`gpt-5.6-terra`；思考强度：`medium`；理由：需要代码诊断、范围控制和测试验证，但停止条件明确且不需要持久状态。
+建议：执行模式：`refine_then_execute`；模型：`gpt-5.6-terra`；思考强度：`medium`；理由：需要代码诊断、范围控制和测试验证，但停止条件明确且不需要持久 Goal。
 
 目标：端到端诊断并修复登录故障。
 
@@ -52,105 +54,26 @@ Refined prompt:
 
 输出：
 先给结果，再概述根因、修改文件、验证结果和剩余风险。
+
+[then inspect files, edit only authorized files, and validate]
 ```
 
-Why this shape works: it preserves the explicit exclusions and turns process narration into completion criteria.
+Why this shape works: the task authorizes ordinary local execution but preserves exclusions and confirmation gates.
 
-## Grounded research
+## Goal creation explicitly authorized
 
 Raw input:
 
 ```text
-查一下最近有哪些多模态剪枝的方法，最好都列出来，要有引用，不确定的别瞎说。
+把这个研究项目从方案设计、数据准备、实验执行、结果分析一直做到论文初稿。实验可能跑几天，中断后要能继续；每个阶段通过验收后再进入下一阶段，失败的实验要记录并重试。润色后如果你判断需要目标，就创建 Goal 开始做。
 ```
 
-Refined prompt:
+Response shape:
 
 ```markdown
 ### 重构后的提示词
 
-建议：目标模式：普通对话即可；模型：`gpt-5.6-sol`；思考强度：`high`；理由：任务需要当前检索、多源证据核对、统一分类和对穷尽性边界的审慎判断。
-
-目标：形成一份当前且有证据支持的多模态模型剪枝方法综述。
-
-成功标准：
-- 覆盖主要方法类别及代表性工作；
-- 区分来源直接支持的事实与推断；
-- 说明检索范围和重要覆盖限制；
-- 按剪枝对象、粒度、校准数据、训练需求和评测设置等统一维度比较方法。
-
-证据与检索：
-- 重要结论使用当前的一手来源；
-- 引用紧跟其支持的结论；
-- 明确说明来源冲突；
-- 不要把缺少证据表述成事实上的“不存在”；
-- 如果无法证明穷尽性，将“所有方法”收窄为实际检索范围内有证据支持的方法。
-
-输出：
-使用中文。先给出简洁分类，再提供比较表和主要证据缺口。
-
-停止规则：
-主要类别和代表性一手来源均有支持后停止。只有缺少必需的比较字段或重要的新近方法类别时才继续检索。
-```
-
-Why this shape works: it converts an unsafe exhaustive claim into an explicit coverage contract without weakening the user's research goal.
-
-## Editing with preservation
-
-Raw input:
-
-```text
-帮我润色这段论文，写得更专业一点，但不要改实验数字，也别把结论吹大。
-```
-
-Refined prompt:
-
-```markdown
-### 重构后的提示词
-
-建议：目标模式：普通对话即可；模型：`gpt-5.6-luna`；思考强度：`low`；理由：这是边界明确的文本改写，关键要求是保持事实和结论强度。
-
-润色给定论文段落，提高表达清晰度、连贯性、准确性和专业性。
-
-优先保留原有实验数字、事实性陈述、结论强度、段落功能和引用关系。不要添加新证据、强化结论、使用宣传性措辞或增加新章节。
-
-只返回使用原文语言改写后的段落。
-```
-
-Why this shape works: preservation priorities matter more than a generic “professional” persona.
-
-## Material ambiguity
-
-Raw input:
-
-```text
-把这个项目整理好然后发出去。
-```
-
-Required response before refinement:
-
-```markdown
-### 待确认项
-
-- “发出去”具体指推送代码、发布软件包、部署服务，还是发送给某个人？目标不同会改变授权和验收范围。
-```
-
-Why this shape works: guessing would authorize a materially different external action.
-
-## Goal mode recommended
-
-Raw input:
-
-```text
-把这个研究项目从方案设计、数据准备、实验执行、结果分析一直做到论文初稿。实验可能跑几天，中断后要能继续；每个阶段通过验收后再进入下一阶段，失败的实验要记录并重试。
-```
-
-Refined prompt:
-
-```markdown
-### 重构后的提示词
-
-建议：目标模式：建议使用；模型：`gpt-5.6-sol`；思考强度：`high`；理由：任务包含多阶段验收、长时间实验、中断恢复和失败重试，持久状态会直接影响完成质量。
+建议：执行模式：`refine_then_create_goal`；模型：`gpt-5.6-sol`；思考强度：`high`；理由：任务包含多阶段验收、长时间实验、中断恢复和失败重试，且用户已明确授权在需要时创建 Goal。
 
 目标：
 完成研究方案设计、数据准备、实验执行、结果分析和论文初稿，并保持阶段之间的证据与决策连续性。
@@ -178,26 +101,106 @@ Refined prompt:
 
 停止规则：
 论文初稿、实验依据和阶段验收记录均完成后停止；遇到会改变研究目标、验收标准、授权范围或资源成本的阻塞时请求确认。
+
+[then call create_goal with a compact objective derived from the refined prompt]
 ```
 
-Why this shape works: Goal mode provides material value through durable state, dependent milestones, recovery, and acceptance gates, so the refined prompt uses the fixed Goal-mode template directly.
+Why this shape works: Goal creation is allowed because durable state is useful and the user explicitly authorized it.
 
-## Goal mode omitted
+## Goal useful but not authorized
 
 Raw input:
 
 ```text
-检查这个函数为什么在空列表时报错，修复后运行对应单元测试，不要改公开接口。
+持续推进这个实验，失败要重试，中断后继续，最后给我完整报告。
 ```
 
-Refined prompt:
+Response shape:
 
 ```markdown
 ### 重构后的提示词
 
-建议：目标模式：普通对话即可；模型：`gpt-5.6-terra`；思考强度：`medium`；理由：需要理解代码、实施修复和验证，但范围小、停止条件明确且不需要持久状态。
+建议：执行模式：`refine_only`；模型：`gpt-5.6-sol`；思考强度：`high`；理由：任务适合 Goal，但用户尚未明确授权创建 Goal。
 
-诊断并修复该函数处理空列表时的错误。保留现有公开接口，实施范围内的最小修改，并运行对应单元测试；如果测试无法运行，说明原因和下一项最有效的验证。
+目标：
+持续推进实验直到完成，并保留中断恢复、失败重试和最终报告所需的状态与证据。
+
+背景与输入：
+[当前实验项目、配置、数据、日志和运行环境。若缺少路径或实验入口，先询问。]
+
+成功标准：
+- 实验完成或达到用户定义的停止条件；
+- 失败原因、重试记录和有效结果可追踪；
+- 最终报告中的结论有运行证据支持。
+
+约束与授权：
+- 不要伪造或扩大实验结论；
+- 不要执行高成本、外部发布、删除或远程写入操作，除非另有确认；
+- 创建 Goal 前必须得到明确授权。
+
+工具与验证：
+检查实验配置、运行日志、状态文件和验证脚本；记录无法运行的验证原因。
+
+输出：
+使用中文，按阶段报告进展、证据、失败、重试和最终结论。
+
+停止规则：
+完成最终报告后停止；缺少实验入口、资源授权或 Goal 创建授权时先询问。
+
+### 待确认项
+
+- 这个任务适合创建 Goal。是否授权我基于上述提示词创建 Goal 并开始执行？
 ```
 
-Why this shape works: this is a bounded change with a clear validation path, so Goal mode would add overhead without durable orchestration value.
+Why this shape works: the skill may recommend a Goal, but without explicit authorization it must stop before `create_goal`.
+
+## No execution requested
+
+Raw input:
+
+```text
+把这个项目整理好然后发出去，先给计划，不要动文件。
+```
+
+Response shape:
+
+```markdown
+### 重构后的提示词
+
+建议：执行模式：`refine_only`；模型：`gpt-5.6-terra`；思考强度：`medium`；理由：用户明确要求先给计划且不要动文件。
+
+目标：制定项目整理与发布前准备计划，不修改文件、不执行发布。
+
+成功标准：
+- 明确“整理好”和“发出去”可能包含的工作项；
+- 标出需要用户确认的发布目标、范围和授权；
+- 给出可执行但尚未执行的分阶段计划。
+
+约束与授权：
+- 不要修改文件；
+- 不要发布、推送、部署或发送给外部对象；
+- 等用户确认发布目标和执行授权后再动手。
+
+输出：
+使用中文，先给计划，再列待确认项。
+```
+
+Why this shape works: explicit no-execution wording overrides execution or Goal creation.
+
+## Material ambiguity
+
+Raw input:
+
+```text
+把这个项目整理好然后发出去。
+```
+
+Required response before refinement:
+
+```markdown
+### 待确认项
+
+- “发出去”具体指推送代码、发布软件包、部署服务，还是发送给某个人？目标不同会改变授权和验收范围。
+```
+
+Why this shape works: guessing would authorize a materially different external action.
