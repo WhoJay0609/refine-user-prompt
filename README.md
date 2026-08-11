@@ -1,6 +1,6 @@
 # refine-user-prompt
 
-`refine-user-prompt` is a Codex skill that restructures raw user requests into lean, outcome-first prompts while preserving intent, facts, scope, authorization, evidence requirements, and output constraints.
+`refine-user-prompt` is an explicitly invoked Codex prompt compiler. It restructures a raw request into one lean, outcome-first prompt, displays that prompt exactly once, and stops before answering, using target-task tools, executing the task, or creating a Goal. Host-required Skill loading and one concise activation announcement remain allowed.
 
 It follows the principles in OpenAI's [Prompting guidance for GPT-5.6](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6): define the outcome and completion bar, remove repeated instructions, preserve true constraints, and leave room for the model to choose an efficient path.
 
@@ -9,10 +9,12 @@ It follows the principles in OpenAI's [Prompting guidance for GPT-5.6](https://d
 - Preserves explicit facts, values, exclusions, permissions, and requested output.
 - Removes repetition, irrelevant process narration, and contradictory scaffolding.
 - Keeps simple requests short and adds structure only when it changes behavior.
-- Asks only the smallest question needed to resolve a material ambiguity.
+- Preserves the smallest question needed to resolve a material ambiguity and instructs the future executor to ask it before acting.
 - Recommends one explicit GPT-5.6 model variant and reasoning effort from task difficulty, risk, verification burden, latency, and cost priorities.
-- Recommends Codex Goal mode when durable state, dependent milestones, recovery, or repeated monitoring materially justify it.
-- Never creates a Goal or executes the refined task unless the user explicitly requests that separate action.
+- Runs only when explicitly invoked as `$refine-user-prompt`; ordinary tasks never trigger it implicitly.
+- Preserves requested execution as future work while keeping prompt compilation and task execution in separate user turns.
+- Never uses target-task tools, creates a Goal, or executes the refined task in the refinement turn; only host-required Skill-resource reads are allowed.
+- Adds an execution-continuity rule to tool-using prompts so a later executor advances after results or recovery without repeating the prompt or startup message.
 
 ## Model guidance
 
@@ -31,8 +33,10 @@ skills/refine-user-prompt/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
-└── references/
-    └── examples.md
+├── references/
+│   └── examples.md
+└── scripts/
+    └── validate_anti_loop.py
 ```
 
 The installable skill is kept under `skills/refine-user-prompt/`; repository documentation and licensing remain outside the skill package.
@@ -68,12 +72,15 @@ $refine-user-prompt
 [原始输入]
 ```
 
+The skill returns the compiled prompt and stops. Send a later message such as `继续` or `按上面执行` to start the task without invoking the skill again.
+
 ## Validate
 
 Run the generic Codex skill validator against the installable package:
 
 ```bash
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/refine-user-prompt
+python3 skills/refine-user-prompt/scripts/validate_anti_loop.py
 ```
 
 ## License
