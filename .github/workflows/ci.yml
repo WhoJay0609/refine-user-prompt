@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate anti-loop contract
+        run: python3 skills/refine-user-prompt/scripts/validate_anti_loop.py
+      - name: Validate SKILL.md frontmatter
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          text = Path("skills/refine-user-prompt/SKILL.md").read_text(encoding="utf-8")
+          match = re.match(r"^---\n(.*?)\n---\n", text, re.DOTALL)
+          assert match, "SKILL.md missing YAML frontmatter"
+          fm = match.group(1)
+          name_match = re.search(r"^name:\s*(.+)$", fm, re.MULTILINE)
+          desc_match = re.search(r"^description:\s*(.+)$", fm, re.MULTILINE)
+          assert name_match and name_match.group(1).strip() == "refine-user-prompt", "Invalid frontmatter name"
+          assert desc_match and len(desc_match.group(1).strip()) > 20, "Missing or empty frontmatter description"
+          print("SKILL.md frontmatter: PASS")
+          PY
